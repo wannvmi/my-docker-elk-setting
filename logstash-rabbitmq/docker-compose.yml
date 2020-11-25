@@ -30,7 +30,7 @@ services:
       - "9601:9600"
       - "8087:8087"
     environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+      LS_JAVA_OPTS: "-Xmx1g -Xms1g"
     networks:
       - logstashrabbitmq
     depends_on:
