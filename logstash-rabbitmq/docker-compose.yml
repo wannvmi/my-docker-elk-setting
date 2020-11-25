@@ -1,0 +1,41 @@
+version: '3.2'
+services:
+  rabbitmq:
+    image: rabbitmq:3.8.9-management
+    restart: always
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - ./data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+      - logstashrabbitmq
+
+  logstash:
+    build:
+      context: logstash/
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    ports:
+      - "9601:9600"
+      - "8087:8087"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - logstashrabbitmq
+    depends_on:
+      - rabbitmq
+
+networks:
+  logstashrabbitmq:
+    driver: bridge
